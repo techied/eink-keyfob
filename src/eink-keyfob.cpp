@@ -2,7 +2,7 @@
 //       THIS IS A GENERATED FILE - DO NOT EDIT       //
 /******************************************************/
 
-#line 1 "c:/Users/slurp/Downloads/GxEPD2_PP-master/examples/GxEPD2_PP_Example/src/GxEPD2_PP_Example.ino"
+#line 1 "c:/Users/slurp/eink-keyfob/src/eink-keyfob.ino"
 // Display Library example for SPI e-paper panels from Dalian Good Display and boards from Waveshare.
 // Requires HW SPI and Adafruit_GFX. Caution: these e-papers require 3.3V supply AND data lines!
 //
@@ -37,7 +37,7 @@ void initDisplay();
 void drawStats();
 void wipeScreen();
 void showBox(uint16_t x, uint16_t y, uint16_t w, uint16_t h, bool partial);
-#line 29 "c:/Users/slurp/Downloads/GxEPD2_PP-master/examples/GxEPD2_PP_Example/src/GxEPD2_PP_Example.ino"
+#line 29 "c:/Users/slurp/eink-keyfob/src/eink-keyfob.ino"
 #include <Adafruit_GFX.h>
 #include <FreeSans9pt7b.h>
 #include <GxEPD2_BW.h>
@@ -67,7 +67,6 @@ void loop()
 {
   bool cellReady = Cellular.ready();
   bool cloudReady = Particle.connected();
-  initDisplay();
   Serial.printlnf("cell=%s cloud=%s counter=%d", (cellReady ? "on" : "off"), (cloudReady ? "on" : "off"), counter++);
 
   if (cellReady && cloudReady)
@@ -115,7 +114,6 @@ void loop()
 
 void initDisplay()
 {
-  wipeScreen();
   drawStats();
 }
 
@@ -205,4 +203,4 @@ void showBox(uint16_t x, uint16_t y, uint16_t w, uint16_t h, bool partial)
 
 #include "Particle.h"
 SYSTEM_THREAD(ENABLED);
-SYSTEM_MODE(MANUAL);
+// SYSTEM_MODE(MANUAL);

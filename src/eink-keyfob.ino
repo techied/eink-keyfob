@@ -55,7 +55,6 @@ void loop()
 {
   bool cellReady = Cellular.ready();
   bool cloudReady = Particle.connected();
-  initDisplay();
   Serial.printlnf("cell=%s cloud=%s counter=%d", (cellReady ? "on" : "off"), (cloudReady ? "on" : "off"), counter++);
 
   if (cellReady && cloudReady)
@@ -103,7 +102,6 @@ void loop()
 
 void initDisplay()
 {
-  wipeScreen();
   drawStats();
 }
 
@@ -193,4 +191,4 @@ void showBox(uint16_t x, uint16_t y, uint16_t w, uint16_t h, bool partial)
 
 #include "Particle.h"
 SYSTEM_THREAD(ENABLED);
-SYSTEM_MODE(MANUAL);
+// SYSTEM_MODE(MANUAL);
