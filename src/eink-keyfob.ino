@@ -69,7 +69,6 @@ void loop()
 
       Serial.println("calling System.sleep");
       drawStats();
-      display.hibernate();
       loopCount++;
       if(loopCount==4){
         Particle.publishVitals(0);
@@ -82,6 +81,7 @@ void loop()
       // In this mode, setup() is not called again. Sometimes, but not always, the Serial port does
       // not restore properly. This solves the problem.
       Serial.begin(115200);
+      // display.init(115200);
 
       // In this mode,after the sleep period is done, execution continues where we left off,
       // with variables intact.
@@ -102,11 +102,13 @@ void loop()
 
 void initDisplay()
 {
+  // wipeScreen(); // drawStats in full screen mode wipes the display anyways
   drawStats();
 }
 
 void drawStats()
 {
+  // for Argon & Xenon: int battPercentage = analogRead(BATT) * 0.0011224 / 4.7 * 100;
   // initDisplay();
   int rssi = Cellular.RSSI().rssi;
   int strength = map(rssi, -131, -51, 0, 4);
@@ -117,7 +119,7 @@ void drawStats()
   display.setRotation(1);
   display.setFont(&FreeSans9pt7b);
   display.setTextColor(GxEPD_BLACK);
-  // display.setPartialWindow(0, 0, 296, 16);
+  // display.setPartialWindow(0, 0, 296, 16); // Partial window has dark spot issues in sunlight for some reason...
   display.setFullWindow();
   display.firstPage();
   const int beginX = 235;
@@ -157,6 +159,8 @@ void drawStats()
       display.fillRect(beginX + 16, beginY, 2, 10, GxEPD_BLACK);
     }
   } while (display.nextPage());
+  
+  display.hibernate(); // Keep the display from developing dark spots when in sunlight.
 }
 void wipeScreen()
 {
