@@ -260,5 +260,6 @@ int get_charging_state() {
 }
 
 #include "Particle.h"
-// SYSTEM_THREAD(ENABLED);
+SYSTEM_THREAD(ENABLED);
+
 // SYSTEM_MODE(SEMI_AUTOMATIC);
