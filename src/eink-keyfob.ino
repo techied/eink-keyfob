@@ -151,6 +151,9 @@ void drawStats()
         Serial.println("Charging");
         display.drawInvertedBitmap(beginX - 16, 0, charging, 15, 15, GxEPD_BLACK);
         break;
+      case 4:
+        Serial.println("Discharging");
+        break;
       default:
         Serial.println("Battery fault");
         display.drawInvertedBitmap(beginX - 16, 0, battery_fault, 15, 15, GxEPD_BLACK);
@@ -261,5 +264,4 @@ int get_charging_state() {
 
 #include "Particle.h"
 SYSTEM_THREAD(ENABLED);
-
 // SYSTEM_MODE(SEMI_AUTOMATIC);
