@@ -39,13 +39,14 @@ SystemSleepConfiguration config;
 void setup()
 {
   Serial.begin(115200);
+  delay(1000); // give serial port time to open
   Serial.println("setup called");
   config.mode(SystemSleepMode::STOP)
       .gpio(D0, RISING)
       .duration(5min)
       .flag(SystemSleepFlag::WAIT_CLOUD)
       .network(NETWORK_INTERFACE_CELLULAR);
-  display.init(115200);
+  display.init(0);
   Time.zone(-8);
   Time.beginDST();
   initDisplay();
@@ -110,9 +111,11 @@ void drawStats()
 {
   // for Argon & Xenon: int battPercentage = analogRead(BATT) * 0.0011224 / 4.7 * 100;
   // initDisplay();
+  int charging_state = get_charging_state();
+  Serial.printlnf("Charging state: %d", charging_state);
   int rssi = Cellular.RSSI().rssi;
   int strength = map(rssi, -131, -51, 0, 4);
-  String time = Time.format(Time.now(), "%m/%d/%y %I:%M %p");
+  String time = Time.format(Time.now(), "%b %d %I:%M %p");
   const char netDisabled[] = "x";
   char percentage[64];
   snprintf(percentage, sizeof(percentage), "%i%%", (int) System.batteryCharge());
@@ -126,12 +129,35 @@ void drawStats()
   const int beginY = 3;
   do
   {
+    // battery %
     display.fillScreen(GxEPD_WHITE);
     display.setCursor(259, 12);
     display.print(percentage);
+
+    // date & time
     display.setCursor(0, 12);
     display.print(time);
+
+    // delineator
     display.fillRect(0, 15, 296, 1, GxEPD_BLACK);
+    
+    // battery charge status icon
+    switch (charging_state){
+      case 0:
+        Serial.println("Charged");
+        display.drawInvertedBitmap(beginX - 16, 0, charged, 15, 15, GxEPD_BLACK);
+        break;
+      case 1:
+        Serial.println("Charging");
+        display.drawInvertedBitmap(beginX - 16, 0, charging, 15, 15, GxEPD_BLACK);
+        break;
+      default:
+        Serial.println("Battery fault");
+        display.drawInvertedBitmap(beginX - 16, 0, battery_fault, 15, 15, GxEPD_BLACK);
+        break;
+    }
+
+    // cell strength icon
     if (rssi == 0)
     {
       display.setCursor(beginX, beginY + 10);
@@ -193,6 +219,46 @@ void showBox(uint16_t x, uint16_t y, uint16_t w, uint16_t h, bool partial)
   //Serial.println("showBox done");
 }
 
+int get_charging_state() {
+    PMIC power(true);
+    FuelGauge fuel(true);
+    power.begin();
+
+    // In order to read the current fault status, the host has to read REG09 two times
+    // consecutively. The 1st reads fault register status from the last read and the 2nd
+    // reads the current fault register status.
+    const uint8_t curFault = power.getFault();
+
+    const uint8_t status = power.getSystemStatus();
+
+    int state = -1; // unknown
+
+    // Deduce current battery state
+    const uint8_t chrg_stat = (status >> 4) & 0b11;
+    if (chrg_stat) {
+        // Charging or charged
+        if (chrg_stat == 0b11) {
+            state = 0; // charged
+        } else {
+            state = 1; // charging
+        }
+    } else {
+        // For now we only know that the battery is not charging
+        state = 2; // not charging
+        // Now we need to deduce whether it is NOT_CHARGING, DISCHARGING, or in a FAULT state
+        // const uint8_t chrg_fault = (curFault >> 4) & 0b11;
+        const uint8_t bat_fault = (curFault >> 3) & 0b01;
+        // const uint8_t ntc_fault = curFault & 0b111;
+        const uint8_t pwr_good = (status >> 2) & 0b01;
+        if (bat_fault) {
+            state = 3; // battery fault
+        } else if (!pwr_good) {
+            state = 4; // battery discharging
+        }
+    }
+    return state;
+}
+
 #include "Particle.h"
-SYSTEM_THREAD(ENABLED);
-// SYSTEM_MODE(MANUAL);
+// SYSTEM_THREAD(ENABLED);
+// SYSTEM_MODE(SEMI_AUTOMATIC);
