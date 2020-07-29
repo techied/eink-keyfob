@@ -172,6 +172,8 @@ void drawStats()
         display.drawInvertedBitmap(beginX - 16, 0, battery_fault, 15, 15, GxEPD_BLACK);
         break;
     }
+    // show battery low warning
+    
 
     // cell strength icon
     if (rssi == 0)
