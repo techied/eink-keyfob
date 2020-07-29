@@ -135,7 +135,6 @@ void drawStats()
   display.setRotation(1);
   display.setFont(&FreeSans9pt7b);
   display.setTextColor(GxEPD_BLACK);
-  // display.setPartialWindow(0, 0, 296, 16); // Partial window has dark spot issues in sunlight for some reason...
   display.setFullWindow();
   display.firstPage();
   const int beginX = 235;
@@ -166,14 +165,16 @@ void drawStats()
         break;
       case 4:
         Serial.println("Discharging");
+        // show battery low warning
+        if (System.batteryCharge() < 5){
+          display.drawInvertedBitmap(48, 32, please_charge, 200, 64, GxEPD_BLACK);
+        }
         break;
       default:
         Serial.println("Battery fault");
         display.drawInvertedBitmap(beginX - 16, 0, battery_fault, 15, 15, GxEPD_BLACK);
         break;
     }
-    // show battery low warning
-    
 
     // cell strength icon
     if (rssi == 0)
@@ -203,8 +204,6 @@ void drawStats()
       display.fillRect(beginX + 16, beginY, 2, 10, GxEPD_BLACK);
     }
   } while (display.nextPage());
-  
-  display.hibernate(); // Keep the display from developing dark spots when in sunlight.
 }
 void wipeScreen()
 {

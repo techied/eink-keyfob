@@ -152,7 +152,7 @@ void drawStats()
         break;
       case 4:
         Serial.println("Discharging");
-        
+        // show battery low warning
         if (System.batteryCharge() < 5){
           display.drawInvertedBitmap(48, 32, please_charge, 200, 64, GxEPD_BLACK);
         }
@@ -162,7 +162,6 @@ void drawStats()
         display.drawInvertedBitmap(beginX - 16, 0, battery_fault, 15, 15, GxEPD_BLACK);
         break;
     }
-    // show battery low warning
 
     // cell strength icon
     if (rssi == 0)
