@@ -3,3 +3,4 @@ target/
 .vscode/
 eink-keyfob.cpp
 boron_firmware_*.bin
+src/eink-keyfob.cpp
