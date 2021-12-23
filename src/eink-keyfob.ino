@@ -113,7 +113,7 @@ void drawStats()
   // initDisplay();
   int charging_state = get_charging_state();
   Serial.printlnf("Charging state: %d", charging_state);
-  int rssi = Cellular.RSSI().rssi;
+  int rssi = Cellular.RSSI().getStrengthValue();
   int strength = map(rssi, -131, -51, 0, 4);
   String time = Time.format(Time.now(), "%b %d %I:%M %p");
   const char netDisabled[] = "x";
